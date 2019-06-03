@@ -6,6 +6,7 @@ from future.builtins.disabled import *  # noqa  pylint: disable=W0401, W0614
 # === End Python 2/3 compatibility
 
 import numpy as np
+import datetime
 
 from cora.util import units
 
@@ -230,6 +231,17 @@ class Sky3d(Map3d):
         cla = skysim.clarray(self.angular_powerspectrum, lmax, self.nu_pixels,
                              zromb=self.oversample)
 
+        ## Added 05/15/2019
+        cla = skysim.clarray(self.angular_powerspectrum, lmax, self.nu_pixels)
+
+        alms = skysim.mkfullsky(cla, self.nside, alms=True)
+
+        time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+
+        np.savetxt('alms_'+time+'.txt', alms)
+
+        ## End addition 05/15/2019       
+
         return (self.mean_nu(self.nu_pixels)[:, np.newaxis] +
                 skysim.mkfullsky(cla, self.nside))
 
@@ -249,3 +261,20 @@ class Sky3d(Map3d):
         cla = skysim.clarray(self.angular_powerspectrum, lmax, self.nu_pixels)
 
         return skysim.mkfullsky(cla, self.nside, alms=True)
+        # result has shape [# redshift (# of freq slice or map), 1, # l, # m]
+
+    def getclms(self, lmax):
+
+        cla = skysim.clarray(self.angular_powerspectrum, lmax, self.nu_pixels)
+        # cla[# lmax, # redshift, # redshift]
+
+        return cla
+
+    def getalms2(self, lmax):
+
+        cla = skysim.clarray(self.angular_powerspectrum, lmax, self.nu_pixels)
+
+        alms = skysim.mkfullsky(cla, self.nside, alms=True)
+        return alms[:,0,:,:]
+        # result has shape [# redshift (# of freq slice or map), # l, # m]
+

@@ -787,6 +787,7 @@ class RedshiftCorrelation(object):
         """
 
         from ..util import sphfunc
+        from ..util import integrate
 
         def _ps_single(l, z1, z2):
             if not self._vv_only:
